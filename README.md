@@ -2,6 +2,8 @@
 
 An image resize service backed by Supabase.
 
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/jambff/supabase-image-resizer/tree/main)
+
 ## Manual setup
 
 Install the package:

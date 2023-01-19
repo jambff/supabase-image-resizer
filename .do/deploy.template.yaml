@@ -1,0 +1,31 @@
+
+spec:
+  name: supabase-image-resizer
+  services:
+  - name: image-resizer
+    github:
+      branch: main
+      repo_clone_url: https://github.com/jambff/supabase-image-resizer
+    health_check:
+      http_path: /healthcheck
+    http_port: 7000
+    routes:
+    - path: /
+    build_command: yarn build
+    run_command: yarn start
+    source_dir: /
+    envs:
+    - key: NODE_ENV
+      scope: RUN_TIME
+      value: production
+    - key: HOST
+      scope: RUN_TIME
+      value: "0.0.0.0"
+    - key: PORT
+      scope: RUN_TIME
+      value: "7000"
+    - key: SUPABASE_SERVICE_ROLE_KEY
+      value: "your-key"
+      type: SECRET
+    - key: SUPABASE_PROJECT_URL
+      scope: RUN_TIME

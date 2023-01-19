@@ -1,18 +1,12 @@
 import { Request, Response } from 'express';
 import { currentUrl } from 'current-url';
 import qs from 'qs';
+import fetch from 'node-fetch';
 import { getSupabaseClient } from './supabase';
 import { logger } from './logger';
 import { resizeBuffer } from './resize-image';
 
 const ONE_YEAR = 31536000;
-
-type StorageError = {
-  status: number;
-};
-
-const isStorageError = (error: unknown): error is StorageError =>
-  typeof error === 'object' && error !== null && 'status' in error;
 
 export const handleImageRequest = async (req: Request, res: Response) => {
   const url = currentUrl(req);
@@ -21,21 +15,25 @@ export const handleImageRequest = async (req: Request, res: Response) => {
     .split('/')
     .map((part: string) => part.trim());
 
-  const { data, error } = await supabase.storage
+  const {
+    data: { publicUrl },
+  } = supabase.storage
     .from(bucket)
-    .download(`/${decodeURI(pathParts.join('/'))}`);
+    .getPublicUrl(`/${decodeURI(pathParts.join('/'))}`);
 
-  if (error) {
-    logger.error(error);
-    const statusCode = isStorageError(error) ? error.status : 404;
+  let supabaseRes;
 
-    res.status(statusCode).end();
+  try {
+    supabaseRes = await fetch(publicUrl);
+  } catch (err) {
+    logger.error(err);
+    res.status(500).end();
 
     return;
   }
 
-  if (!data) {
-    res.status(404).end();
+  if (supabaseRes.status !== 200) {
+    res.status(supabaseRes.status).end();
 
     return;
   }
@@ -45,10 +43,11 @@ export const handleImageRequest = async (req: Request, res: Response) => {
 
   try {
     ({ data: imageBuffer, info } = await resizeBuffer(
-      Buffer.from(await data.arrayBuffer()),
+      await supabaseRes.buffer(),
       qs.parse(url.search.replace('?', '')),
     ));
-  } catch {
+  } catch (err) {
+    logger.error(err);
     res.status(500).end();
 
     return;
@@ -56,6 +55,7 @@ export const handleImageRequest = async (req: Request, res: Response) => {
 
   res.writeHead(200, {
     'Content-Type': `image/${info.format}`,
+    'Content-Length': info.size,
     'Cache-Control': `max-age=${ONE_YEAR}`,
     'Last-Modified': new Date().toUTCString(),
   });

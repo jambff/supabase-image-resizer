@@ -5,7 +5,7 @@ spec:
   - name: image-resizer
     github:
       branch: main
-      repo_clone_url: https://github.com/jambff/supabase-image-resizer
+      repo: jambff/supabase-image-resizer
     health_check:
       http_path: /healthcheck
     http_port: 7000

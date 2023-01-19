@@ -51,7 +51,7 @@ export const setCacheHeaders = (
   const cacheControl = [];
 
   if (maxAge) {
-    res.setHeader('Cache-Control', `max-age=${getSeconds(maxAge)}`);
+    res.setHeader('Cache-Control', `public, max-age=${getSeconds(maxAge)}`);
   }
 
   if (staleWhileRevalidate) {

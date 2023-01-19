@@ -3,9 +3,9 @@ spec:
   name: supabase-image-resizer
   services:
   - name: image-resizer
-    github:
+    git:
       branch: main
-      repo: jambff/supabase-image-resizer
+      repo_clone_url: https://github.com/jambff/supabase-image-resizer.git
     health_check:
       http_path: /healthcheck
     http_port: 7000

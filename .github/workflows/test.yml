@@ -1,0 +1,21 @@
+on: workflow_call
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install
+        run: yarn install --frozen-lockfile --non-interactive
+      - name: Lint
+        run: yarn lint
+      - name: Check types
+        run: yarn typecheck
+      - name: Restore Jest cache
+        uses: actions/cache@v3
+        with:
+          path: .jest-cache
+          key: ${{ runner.os }}-jest
+      - name: Test
+        run: yarn test

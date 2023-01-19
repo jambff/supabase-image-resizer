@@ -9,6 +9,7 @@ import getPort from 'get-port';
 import { logger } from './logger';
 import { getServerMode, ServerMode } from './server-mode';
 import { disableCache } from './cache';
+import { handleImageRequest } from './image-request-handler';
 
 dotenv.config();
 
@@ -197,6 +198,7 @@ export const launch = async (serverOptions: ServerOptions): Promise<Server> => {
   trustProxies(app);
 
   defineHealthcheck(app);
+  app.get('*', handleImageRequest);
 
   const server = await listen(finalServerOptions);
 

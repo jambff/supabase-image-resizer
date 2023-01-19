@@ -7,6 +7,13 @@ import { resizeBuffer } from './resize-image';
 
 const ONE_YEAR = 31536000;
 
+type StorageError = {
+  status: number;
+};
+
+const isStorageError = (error: unknown): error is StorageError =>
+  typeof error === 'object' && error !== null && 'status' in error;
+
 export const handleImageRequest = async (req: Request, res: Response) => {
   const url = currentUrl(req);
   const supabase = getSupabaseClient();
@@ -20,18 +27,32 @@ export const handleImageRequest = async (req: Request, res: Response) => {
 
   if (error) {
     logger.error(error);
-  }
+    const statusCode = isStorageError(error) ? error.status : 404;
 
-  if (!data) {
-    res.status(404).send();
+    res.status(statusCode).end();
 
     return;
   }
 
-  const { data: imageBuffer, info } = await resizeBuffer(
-    Buffer.from(await data.arrayBuffer()),
-    qs.parse(url.search.replace('?', '')),
-  );
+  if (!data) {
+    res.status(404).end();
+
+    return;
+  }
+
+  let imageBuffer;
+  let info;
+
+  try {
+    ({ data: imageBuffer, info } = await resizeBuffer(
+      Buffer.from(await data.arrayBuffer()),
+      qs.parse(url.search.replace('?', '')),
+    ));
+  } catch {
+    res.status(500).end();
+
+    return;
+  }
 
   res.writeHead(200, {
     'Content-Type': `image/${info.format}`,

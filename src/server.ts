@@ -6,6 +6,7 @@ import cors, { CorsOptions } from 'cors';
 import dotenv from 'dotenv';
 import appRoot from 'app-root-path';
 import getPort from 'get-port';
+import timeout from 'connect-timeout';
 import { logger } from './logger';
 import { getServerMode, ServerMode } from './server-mode';
 import { disableCache } from './cache';
@@ -191,6 +192,7 @@ export const launch = async (serverOptions: ServerOptions): Promise<Server> => {
   app.set('port', port);
 
   app.use(express.urlencoded({ extended: false }));
+  app.use(timeout('30s'));
 
   app.use(cors(corsOptions));
 

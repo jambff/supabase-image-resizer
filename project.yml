@@ -1,0 +1,13 @@
+packages:
+  - name: image-resizer
+    actions:
+      - name: image-resizer
+        runtime: 'nodejs:default'
+        web: true
+        limits:
+          memory: 1024
+          timeout: 5000
+
+environment:
+  SUPABASE_PROJECT_URL: ${SUPABASE_PROJECT_URL}
+  SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}

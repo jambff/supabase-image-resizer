@@ -2,7 +2,38 @@
 
 An image resize service backed by Supabase.
 
+## Deploying with DigitalOcean
+
+### Deploy using App Platform
+
 [![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/jambff/supabase-image-resizer/tree/main)
+
+### Deploy using Functions
+
+Install and configure [doctl](https://docs.digitalocean.com/reference/doctl/how-to/install/),
+along with the serverless plugin:
+
+```text
+doctl serverless install
+```
+
+Create a namespace for the function:
+
+```text
+doctl serverless namespaces create --label image-resizer --region lon1
+```
+
+Create a .env file and populate with your `SUPABASE_PROJECT_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
+
+```text
+cp .env.template .env
+```
+
+Deploy the function:
+
+```text
+doctl serverless deploy . --env .env
+```
 
 ## Manual setup
 

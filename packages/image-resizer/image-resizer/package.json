@@ -1,0 +1,10 @@
+{
+  "name": "image-resizer",
+  "version": "1.0.0",
+  "description": "Image resizer backed by Supabase",
+  "main": "index.js",
+  "dependencies": {
+    "@jambff/supabase-image-resizer": "^1.1.1",
+    "sharp": "^0.31.3"
+  }
+}

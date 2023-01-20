@@ -1,4 +1,5 @@
-import express, { Application } from 'express';
+import express, { Application, Request, Response } from 'express';
+import { currentUrl } from 'current-url';
 import lusca from 'lusca';
 import type { Server as HttpServer } from 'http';
 import { Socket } from 'net';
@@ -7,10 +8,11 @@ import dotenv from 'dotenv';
 import appRoot from 'app-root-path';
 import getPort from 'get-port';
 import timeout from 'connect-timeout';
+import qs from 'qs';
 import { logger } from './logger';
 import { getServerMode, ServerMode } from './server-mode';
 import { disableCache } from './cache';
-import { handleImageRequest } from './image-request-handler';
+import { main } from './main';
 
 dotenv.config();
 
@@ -179,6 +181,23 @@ const getServerOptions = async (
     port: availablePort,
     corsOptions: { origin: '*' },
   };
+};
+
+const handleImageRequest = async (req: Request, res: Response) => {
+  const url = currentUrl(req);
+  const args = qs.parse(url.search.replace('?', ''));
+  const { body, headers, status } = await main({
+    ...args,
+    __ow_path: url.pathname,
+  });
+
+  if (status !== 200) {
+    res.status(status).end(body);
+
+    return;
+  }
+
+  res.writeHead(200, headers).end(Buffer.from(body ?? '', 'base64'));
 };
 
 /**

@@ -1,6 +1,6 @@
 {
   "name": "@jambff/supabase-image-resizer",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "Alex Mendes",
   "license": "MIT",
   "main": "dist/index.js",
